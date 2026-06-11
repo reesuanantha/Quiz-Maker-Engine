@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Maker Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        input, button {
+            padding: 8px;
+            margin: 5px;
+        }
+
+        .question-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #quizSection {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Quiz Maker Engine</h1>
+
+<div id="creatorSection">
+    <h2>Create Question</h2>
+
+    <input type="text" id="question" placeholder="Enter Question" size="50"><br>
+
+    <input type="text" id="opt1" placeholder="Option 1"><br>
+    <input type="text" id="opt2" placeholder="Option 2"><br>
+    <input type="text" id="opt3" placeholder="Option 3"><br>
+    <input type="text" id="opt4" placeholder="Option 4"><br>
+
+    <input type="number" id="correct" min="1" max="4"
+           placeholder="Correct Option (1-4)"><br>
+
+    <button onclick="addQuestion()">Add Question</button>
+    <button onclick="startQuiz()">Start Quiz</button>
+
+    <h3>Questions Added: <span id="count">0</span></h3>
+</div>
+
+<div id="quizSection">
+    <h2>Quiz Time</h2>
+    <form id="quizForm"></form>
+
+    <button onclick="submitQuiz()">Submit Quiz</button>
+
+    <h2 id="result"></h2>
+</div>
+
+<script>
+let quizData = [];
+
+function addQuestion() {
+    const question = document.getElementById("question").value;
+    const opt1 = document.getElementById("opt1").value;
+    const opt2 = document.getElementById("opt2").value;
+    const opt3 = document.getElementById("opt3").value;
+    const opt4 = document.getElementById("opt4").value;
+    const correct = parseInt(document.getElementById("correct").value);
+
+    if (!question || !opt1 || !opt2 || !opt3 || !opt4 || !correct) {
+        alert("Fill all fields!");
+        return;
+    }
+
+    quizData.push({
+        question,
+        options: [opt1, opt2, opt3, opt4],
+        correct
+    });
+
+    document.getElementById("count").innerText = quizData.length;
+
+    document.querySelectorAll("input").forEach(i => i.value = "");
+}
+
+function startQuiz() {
+    if (quizData.length === 0) {
+        alert("Add at least one question.");
+        return;
+    }
+
+    document.getElementById("creatorSection").style.display = "none";
+    document.getElementById("quizSection").style.display = "block";
+
+    let html = "";
+
+    quizData.forEach((q, index) => {
+        html += `
+        <div class="question-box">
+            <p><b>${index + 1}. ${q.question}</b></p>
+            ${q.options.map((opt, i) => `
+                <label>
+                    <input type="radio" name="q${index}" value="${i + 1}">
+                    ${opt}
+                </label><br>
+            `).join("")}
+        </div>`;
+    });
+
+    document.getElementById("quizForm").innerHTML = html;
+}
+
+function submitQuiz() {
+    let score = 0;
+
+    quizData.forEach((q, index) => {
+        const selected =
+            document.querySelector(`input[name="q${index}"]:checked`);
+
+        if (selected && parseInt(selected.value) === q.correct) {
+            score++;
+        }
+    });
+
+    document.getElementById("result").innerHTML =
+        `Your Score: ${score} / ${quizData.length}`;
+}
+</script>
+
+</body>
+</html>
